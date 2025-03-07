@@ -12,11 +12,13 @@ public class ElevatorCommand extends Command {
   /** Creates a new ElevatorCommand. */
   ElevatorSubsystem elevator;
   double position;
+  boolean finishes;
 
   public ElevatorCommand(double position, ElevatorSubsystem elevator) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.elevator = elevator;
     this.position = position;
+    this.finishes = true;
     addRequirements(elevator);
   }
 

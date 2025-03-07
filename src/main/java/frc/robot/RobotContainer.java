@@ -23,6 +23,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSubsystem;
+import frc.robot.subsystems.DiagnosticsSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class RobotContainer {
@@ -30,6 +31,7 @@ public class RobotContainer {
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final CoralSubsystem coralSubsystem = new CoralSubsystem();
     private final ClimbSubsystem climberSubsystem = new ClimbSubsystem();
+    //private final DiagnosticsSubsystem diagnosticSubsystem = new DiagnosticsSubsystem();
   //private final PIDSubsystem m_PidSubsystem = new PIDSubsystem(); //FIXME
 
     //******************************************************GENERATED****************************************//
@@ -38,7 +40,7 @@ public class RobotContainer {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+            .withDeadband(MaxSpeed * SpeedConstants.kDeadband).withRotationalDeadband(MaxAngularRate * SpeedConstants.kDeadband) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -70,10 +72,20 @@ public class RobotContainer {
             )
         );
 
+        //BRAKE = X
         m_driverController.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
-        ));
+
+        //SLOW MODE = A
+        m_driverController.a().whileTrue(drivetrain.applyRequest(() -> 
+                drive.withVelocityX(-m_driverController.getLeftY() * MaxSpeed * SpeedConstants.kSlowMode)
+                    .withVelocityY(-m_driverController.getLeftX() * MaxSpeed * SpeedConstants.kSlowMode)
+                    .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate * SpeedConstants.kSlowMode)));
+
+        // ??? = B Points in some direction.  Don't really lose.
+        //m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
+        //    point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
+        //));
+
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -90,16 +102,20 @@ public class RobotContainer {
         /***********ELEVATOR SUBSYSTEM!!!  IF USED. DISABLE PID SUBSYTEM************** */
 //FIXME
     //Motion Magic
-  /*   m_operatorController.a().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL1, elevatorSubsystem))
-      .onFalse(new ElevatorCommand(ElevatorConstants.Rest, elevatorSubsystem));*/
+    m_operatorController.b().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL3, elevatorSubsystem))
+        .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
+  //    .onFalse(new ElevatorCommand(ElevatorConstants.Rest, elevatorSubsystem));
+
+    m_operatorController.a().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL4, elevatorSubsystem))
+        .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
 
     //forward manual
     m_operatorController.y().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(SpeedConstants.kManualElevator), elevatorSubsystem))
       .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
 
     //reverse manual
-    m_operatorController.a().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(-SpeedConstants.kManualElevator), elevatorSubsystem))
-      .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
+    //m_operatorController.a().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(-SpeedConstants.kManualElevator), elevatorSubsystem))
+    //  .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
 //FIXME
     /**********PID SUBSYSTEM!!!  IF USED, DISABLE ELEVATOR SUBSYSTEM*************** 
     m_driverController.a().onTrue(new RunCommand(() -> m_PidSubsystem.voltageControl(), m_PidSubsystem))
@@ -115,11 +131,11 @@ public class RobotContainer {
       .onFalse(new RunCommand(() -> m_PidSubsystem.testMotor(0), m_PidSubsystem));*/
 
       //************************************************CORAL RELEASE BUTTON*****************************************************************//
-      m_operatorController.rightTrigger().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(-Constants.SpeedConstants.kCoralRelease), coralSubsystem))
+      m_driverController.rightTrigger().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(-Constants.SpeedConstants.kCoralRelease), coralSubsystem))
               .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(.05), coralSubsystem));
 
       m_operatorController.rightBumper().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(Constants.SpeedConstants.kCoralReverse), coralSubsystem))
-              .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(0), coralSubsystem));
+              .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(.05), coralSubsystem));
 
       //************************************************CLIMBER  BUTTONS***********************************************************************//
       //CLIMB OUT

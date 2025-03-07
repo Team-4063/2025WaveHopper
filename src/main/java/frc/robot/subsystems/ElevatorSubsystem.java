@@ -53,7 +53,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(ElevatorConstants.Jerk));
 
     config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 70.9;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 25;
     config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
     config.CurrentLimits.StatorCurrentLimitEnable = ElevatorConstants.StatorEnable;
@@ -97,10 +97,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Velocity", talon.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Elevator Supply Current",talon.getSupplyCurrent().getValueAsDouble());
     SmartDashboard.putNumber("Elevator Stator Current",talon.getStatorCurrent().getValueAsDouble());
+    SmartDashboard.putNumber("Follower Stator Current", follower.getStatorCurrent().getValueAsDouble());
     SmartDashboard.putNumber("Eleveator Leader Motor Voltage", talon.getMotorVoltage().getValueAsDouble());
     SmartDashboard.putNumber("Elevator Follower Motor Voltage", follower.getMotorVoltage().getValueAsDouble());
     SmartDashboard.putNumber("Elevator Leader Supply Voltage", talon.getSupplyVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Follower Supply Volgate", follower.getSupplyVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("Elevator Follower Supply Voltage", follower.getSupplyVoltage().getValueAsDouble());
   }
 
   public void setZero(){
@@ -119,7 +120,11 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void setElevatorSetpoint(double position){
-    elevatorSetpoint = position;
+    elevatorSetpoint = position / ElevatorConstants.GearRatio;
+  }
+
+  public void setElevatorCoralL3(){
+    setElevatorSetpoint(10);
   }
 
   public void motionMagicSetPosition(){
