@@ -23,8 +23,8 @@ public final class Constants {
     /*public static final double CoralIntake = 12.0;
     public static final double CoralL1 = 10.0;
     public static final double CoralL2 = 15.0;*/
-    public static final double CoralL3 = 10;
-    public static final double CoralL4 = 23;
+    public static final double CoralL3 = 9.5;
+    public static final double CoralL4 = 24;
     public static final double AlgaeLow = 15.0;
     public static final double AlgaeHigh = 20.0;
 
@@ -68,12 +68,14 @@ public final class Constants {
     //Speed Constants
 
     public static final double kCoralRelease = 0.37; //temp speeds, need final speed later.
-    public static final double kCoralReverse = 0.05;
+    public static final double kCoralReverse = 0.08;
+    public static final double kCoralL1Release = 0.1;
+    public static final double kCoralReleaseAuto = 0.45;
     public static final double kClimbOut = .2;//temp speed
     public static final double kClimbIn = .2;//temp speed
     public static final double kManualElevator = .09;//temp speed
 
-    public static final double kSlowMode = 0.1; //Robot speed slow multiplier
+    public static final double kSlowMode = 0.25; //Robot speed slow multiplier
     public static final double kMaxSpeed = 3; //maximum speed for robot in meters per second
     public static final double kDeadband = 0.1; //controller deadband.  Original = 0.1
   }

@@ -92,16 +92,18 @@ public class ElevatorSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     //Dashboard stuff
     SmartDashboard.putNumber("Elevator Position", talon.getRotorPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Setpoint", elevatorSetpoint);
-    SmartDashboard.putNumber("Elevator Velocity", talon.getRotorVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Velocity", talon.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Supply Current",talon.getSupplyCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Stator Current",talon.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Follower Stator Current", follower.getStatorCurrent().getValueAsDouble());
-    SmartDashboard.putNumber("Eleveator Leader Motor Voltage", talon.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Follower Motor Voltage", follower.getMotorVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Leader Supply Voltage", talon.getSupplyVoltage().getValueAsDouble());
-    SmartDashboard.putNumber("Elevator Follower Supply Voltage", follower.getSupplyVoltage().getValueAsDouble());
+    //SmartDashboard.putNumber("Elevator Setpoint", elevatorSetpoint);
+    //SmartDashboard.putNumber("Elevator Velocity", talon.getRotorVelocity().getValueAsDouble());
+    //SmartDashboard.putNumber("Elevator Supply Current",talon.getSupplyCurrent().getValueAsDouble());
+    //SmartDashboard.putNumber("Follower Supply Current", follower.getSupplyCurrent().getValueAsDouble());
+    //SmartDashboard.putNumber("Elevator Stator Current",talon.getStatorCurrent().getValueAsDouble());
+    //SmartDashboard.putNumber("Follower Stator Current", follower.getStatorCurrent().getValueAsDouble());
+    //SmartDashboard.putNumber("Eleveator Leader Motor Voltage", talon.getMotorVoltage().getValueAsDouble());
+    //SmartDashboard.putNumber("Elevator Follower Motor Voltage", follower.getMotorVoltage().getValueAsDouble());
+    //SmartDashboard.putNumber("Elevator Leader Supply Voltage", talon.getSupplyVoltage().getValueAsDouble());
+    //SmartDashboard.putNumber("Elevator Follower Supply Voltage", follower.getSupplyVoltage().getValueAsDouble());
+    SmartDashboard.putNumber("Elevator Leader Temperature", talon.getDeviceTemp().getValueAsDouble());
+    SmartDashboard.putNumber("Follower Temperature", follower.getDeviceTemp().getValueAsDouble());
   }
 
   public void setZero(){

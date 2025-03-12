@@ -6,10 +6,16 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.jar.Attributes.Name;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import frc.robot.commands.ElevatorCommand;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,16 +29,20 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralSubsystem;
-import frc.robot.subsystems.DiagnosticsSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 public class RobotContainer {
     //******************************************************SUBSYSTEMS***************************************//
     private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
     private final CoralSubsystem coralSubsystem = new CoralSubsystem();
     private final ClimbSubsystem climberSubsystem = new ClimbSubsystem();
-    //private final DiagnosticsSubsystem diagnosticSubsystem = new DiagnosticsSubsystem();
-  //private final PIDSubsystem m_PidSubsystem = new PIDSubsystem(); //FIXME
+
+    UsbCamera camera = CameraServer.startAutomaticCapture();
+
+    private final SendableChooser<Command> autoChooser;
+
 
     //******************************************************GENERATED****************************************//
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -55,10 +65,26 @@ public class RobotContainer {
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
+    
     public RobotContainer() {
-        configureBindings();
-    }
+
+      NamedCommands.registerCommand("Coral", new RunCommand(() -> coralSubsystem.coralRelease(-SpeedConstants.kCoralReleaseAuto), coralSubsystem));
+      NamedCommands.registerCommand("ElevatorL3", new ElevatorCommand(ElevatorConstants.CoralL3,elevatorSubsystem));
+      NamedCommands.registerCommand("ElevatorL4", new ElevatorCommand(ElevatorConstants.CoralL4,elevatorSubsystem));
+      NamedCommands.registerCommand("ElevatorDown", new RunCommand(() -> elevatorSubsystem.manualDrive(-SpeedConstants.kManualElevator), elevatorSubsystem));
+      NamedCommands.registerCommand("ElevatorStop", new RunCommand(() -> elevatorSubsystem.manualDrive(0.0), elevatorSubsystem));
+      NamedCommands.registerCommand("CoralHold", new RunCommand(() -> coralSubsystem.coralRelease(0.2), coralSubsystem));
+
+
+      
+
+
+      configureBindings();
+
+      autoChooser = AutoBuilder.buildAutoChooser("None");
+      SmartDashboard.putData("Auto Mode", autoChooser);
+  }
+
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
@@ -81,7 +107,7 @@ public class RobotContainer {
                     .withVelocityY(-m_driverController.getLeftX() * MaxSpeed * SpeedConstants.kSlowMode)
                     .withRotationalRate(-m_driverController.getRightX() * MaxAngularRate * SpeedConstants.kSlowMode)));
 
-        // ??? = B Points in some direction.  Don't really lose.
+        // ??? = B Points in some direction.  Don't really use.
         //m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
         //    point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
         //));
@@ -102,53 +128,46 @@ public class RobotContainer {
         /***********ELEVATOR SUBSYSTEM!!!  IF USED. DISABLE PID SUBSYTEM************** */
 //FIXME
     //Motion Magic
-    m_operatorController.b().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL3, elevatorSubsystem))
-        .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
-  //    .onFalse(new ElevatorCommand(ElevatorConstants.Rest, elevatorSubsystem));
+    m_operatorController.x().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL3, elevatorSubsystem))
+      .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
+      //.onFalse(new ElevatorCommand(ElevatorConstants.Rest, elevatorSubsystem));
 
-    m_operatorController.a().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL4, elevatorSubsystem))
+
+    m_operatorController.y().whileTrue(new ElevatorCommand(ElevatorConstants.CoralL4, elevatorSubsystem))
         .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
 
     //forward manual
-    m_operatorController.y().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(SpeedConstants.kManualElevator), elevatorSubsystem))
+    m_operatorController.a().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(SpeedConstants.kManualElevator), elevatorSubsystem))
       .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
 
     //reverse manual
-    //m_operatorController.a().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(-SpeedConstants.kManualElevator), elevatorSubsystem))
-    //  .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
-//FIXME
-    /**********PID SUBSYSTEM!!!  IF USED, DISABLE ELEVATOR SUBSYSTEM*************** 
-    m_driverController.a().onTrue(new RunCommand(() -> m_PidSubsystem.voltageControl(), m_PidSubsystem))
-      .onFalse(new RunCommand(() -> m_PidSubsystem.brake(), m_PidSubsystem));
-
-    m_driverController.b().onTrue(new RunCommand(() -> m_PidSubsystem.torqueControl(), m_PidSubsystem))
-      .onFalse(new RunCommand(() -> m_PidSubsystem.brake(), m_PidSubsystem));
-
-    m_driverController.y().onTrue(new RunCommand(() -> m_PidSubsystem.testMotor(0.4), m_PidSubsystem))
-      .onFalse(new RunCommand(() -> m_PidSubsystem.testMotor(0), m_PidSubsystem));
-
-    m_driverController.x().onTrue(new RunCommand(() -> m_PidSubsystem.testMotor(-0.4), m_PidSubsystem))
-      .onFalse(new RunCommand(() -> m_PidSubsystem.testMotor(0), m_PidSubsystem));*/
+    m_operatorController.b().whileTrue(new RunCommand(() -> elevatorSubsystem.manualDrive(-SpeedConstants.kManualElevator), elevatorSubsystem))
+      .onFalse(new InstantCommand(() -> elevatorSubsystem.manualDrive(0)));
 
       //************************************************CORAL RELEASE BUTTON*****************************************************************//
-      m_driverController.rightTrigger().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(-Constants.SpeedConstants.kCoralRelease), coralSubsystem))
-              .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(.05), coralSubsystem));
+    m_driverController.rightBumper().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(-Constants.SpeedConstants.kCoralRelease), coralSubsystem))
+            .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(.05), coralSubsystem));
 
-      m_operatorController.rightBumper().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(Constants.SpeedConstants.kCoralReverse), coralSubsystem))
-              .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(.05), coralSubsystem));
+    m_driverController.rightTrigger().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(-Constants.SpeedConstants.kCoralL1Release), coralSubsystem))
+            .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(0.05), coralSubsystem));
+
+    m_operatorController.rightBumper().whileTrue(new RunCommand(() -> coralSubsystem.coralRelease(Constants.SpeedConstants.kCoralReverse), coralSubsystem))
+            .onFalse(Commands.runOnce(() -> coralSubsystem.coralRelease(.05), coralSubsystem));
 
       //************************************************CLIMBER  BUTTONS***********************************************************************//
       //CLIMB OUT
-      m_operatorController.povUp().whileTrue(new RunCommand(() -> climberSubsystem.climberOut(Constants.SpeedConstants.kClimbOut), climberSubsystem))
-              .onFalse(Commands.runOnce(() -> climberSubsystem.climberOut(0), climberSubsystem));
+    m_operatorController.povUp().whileTrue(new RunCommand(() -> climberSubsystem.climberOut(Constants.SpeedConstants.kClimbOut), climberSubsystem))
+            .onFalse(Commands.runOnce(() -> climberSubsystem.climberOut(0), climberSubsystem));
       //CLIMB IN
-      m_operatorController.povDown().whileTrue(new RunCommand(() -> climberSubsystem.climberIn(Constants.SpeedConstants.kClimbIn), climberSubsystem))
-              .onFalse(Commands.runOnce(() -> climberSubsystem.climberIn(0), climberSubsystem));
+    m_operatorController.povDown().whileTrue(new RunCommand(() -> climberSubsystem.climberIn(Constants.SpeedConstants.kClimbIn), climberSubsystem))
+            .onFalse(Commands.runOnce(() -> climberSubsystem.climberIn(0), climberSubsystem));
     }
+
 
     
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser.getSelected();
+        //return Commands.print("No autonomous command configured");
     }
 }

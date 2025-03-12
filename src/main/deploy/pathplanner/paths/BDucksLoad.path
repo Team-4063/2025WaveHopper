@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.0,
-        "y": 1.2
+        "x": 5.082786885245901,
+        "y": 4.768237704918033
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.769365477635938,
-        "y": 1.2964765105810796
+        "x": 5.3585040983606556,
+        "y": 5.3076844262295095
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "DucksN"
     },
     {
       "anchor": {
-        "x": 5.440499999999999,
-        "y": 2.913499999999999
+        "x": 1.2587090163934425,
+        "y": 7.069877049180328
       },
       "prevControl": {
-        "x": 5.643933367801683,
-        "y": 2.7681904515702254
+        "x": 3.4884221311475416,
+        "y": 6.650307377049181
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "WestLoad"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -148.29857033049436
+    "rotation": 126.25383773744483
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.53173210760662
+    "rotation": -30.69972255081447
   },
   "useDefaultConstraints": true
 }

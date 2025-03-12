@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.0,
-        "y": 7.2
+        "x": 7.120696721311476,
+        "y": 7.513422131147541
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.812183966624122,
-        "y": 7.034999583009766
+        "x": 6.932880687935598,
+        "y": 7.348421714157307
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.0,
-        "y": 5.4
+        "x": 5.082786885245901,
+        "y": 4.768237704918033
       },
       "prevControl": {
-        "x": 5.2235385592098424,
-        "y": 5.511939771959693
+        "x": 5.3063254444557435,
+        "y": 4.880177476877726
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "DucksN"
     }
   ],
   "rotationTargets": [],
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -30.894818945230735
+    "rotation": -30.69972255081447
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.06824172513117
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }
